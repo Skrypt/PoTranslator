@@ -1,4 +1,4 @@
-# PoTranslator.Console
+# Orchard Core PoTranslator
 
 A .NET 10 command-line tool for translating PO/POT files using Google Translate or AI providers.
 
