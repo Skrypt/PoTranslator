@@ -258,7 +258,8 @@ public static class ParlotPoParser
             return;
         }
 
-        var key = new POKey(msgid, ctx.MsgidPlural, ctx.Msgctxt);
+        var normalizedMsgctxt = ctx.Msgctxt?.Replace('/', '\\');
+        var key = new POKey(msgid, ctx.MsgidPlural, normalizedMsgctxt);
         var comments = BuildComments(ctx);
 
         if (ctx.MsgidPlural is not null)
@@ -373,11 +374,11 @@ public static class ParlotPoParser
             var colonIndex = part.LastIndexOf(':');
             if (colonIndex > 0 && int.TryParse(part[(colonIndex + 1)..], out var line))
             {
-                refs.Add(new POSourceReference(part[..colonIndex], line));
+                refs.Add(new POSourceReference(part[..colonIndex].Replace('/', '\\'), line));
             }
             else
             {
-                refs.Add(new POSourceReference(part, 0));
+                refs.Add(new POSourceReference(part.Replace('/', '\\'), 0));
             }
         }
 

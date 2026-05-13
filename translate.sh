@@ -9,10 +9,13 @@ MODEL="${4:-}"
 
 # Paths
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+REPO_ROOT="${REPO_ROOT:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
 SOURCE_PATH="$REPO_ROOT/src"
 TARGET_PATH="$REPO_ROOT/tmp/translations"
 HOST_PATH="$SOURCE_PATH/OrchardCore.Cms.Web/Localization"
+
+# Ensure dotnet global tools are discoverable (extractpo).
+export PATH="$PATH:$HOME/.dotnet/tools"
 
 # Clean and create temp directory
 if [ -d "$TARGET_PATH" ]; then
@@ -20,9 +23,9 @@ if [ -d "$TARGET_PATH" ]; then
 fi
 mkdir -p "$TARGET_PATH"
 
-# Install and run PO extractor
+# Install and run PO extractor (pinned to 1.2.0 — v1.3.0 drops existing translations)
 dotnet tool uninstall --global OrchardCoreContrib.PoExtractor 2>/dev/null || true
-dotnet tool install --global OrchardCoreContrib.PoExtractor
+dotnet tool install --global OrchardCoreContrib.PoExtractor --version 1.2.0
 extractpo "$SOURCE_PATH" "$TARGET_PATH"
 
 # Build the translator

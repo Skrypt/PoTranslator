@@ -2,12 +2,17 @@ param(
     [string]$Provider = "google-service-account",
     [string]$Lang = "fr",
     [string]$ApiKey,
-    [string]$Model
+    [string]$Model,
+    [string]$RepoRoot
 )
 
-$CurrentPath = Get-Location
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$RepoRoot = (Get-Item $ScriptDir).Parent.Parent.FullName
+
+# If RepoRoot not provided, derive from script location (two levels up)
+if (-not $RepoRoot) {
+    $RepoRoot = (Get-Item $ScriptDir).Parent.Parent.FullName
+}
+
 $SourcePath = Join-Path $RepoRoot "src"
 $TargetPath = Join-Path $RepoRoot "tmp\translations"
 $HostPath = Join-Path $SourcePath "OrchardCore.Cms.Web\Localization"
@@ -18,9 +23,9 @@ if (Test-Path -Path $TargetPath) {
 }
 New-Item -Path $TargetPath -ItemType Directory -Force | Out-Null
 
-# Install and run PO extractor
+# Install and run PO extractor (pinned for deterministic output)
 dotnet tool uninstall --global OrchardCoreContrib.PoExtractor 2>$null
-dotnet tool install --global OrchardCoreContrib.PoExtractor
+dotnet tool install --global OrchardCoreContrib.PoExtractor --version 1.2.0
 extractpo $SourcePath $TargetPath
 
 # Build the translator
